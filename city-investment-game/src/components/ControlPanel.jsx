@@ -1,61 +1,65 @@
 import { BUILDINGS } from '../constants/game'
 
 const BUY_BUTTONS = [
-  { buildingType: 'bond',   label: '🏘️ Gov. Bond',  colorOn: 'bg-blue-800 hover:bg-blue-600 border-blue-600',     colorOff: 'bg-slate-700 border-slate-600 opacity-40' },
-  { buildingType: 'stock',  label: '🏢 Stock',       colorOn: 'bg-green-800 hover:bg-green-600 border-green-600',   colorOff: 'bg-slate-700 border-slate-600 opacity-40' },
-  { buildingType: 'gold',   label: '🪙 Gold',        colorOn: 'bg-yellow-700 hover:bg-yellow-500 border-yellow-500',colorOff: 'bg-slate-700 border-slate-600 opacity-40' },
-  { buildingType: 'etf',    label: '📊 ETF',         colorOn: 'bg-cyan-800 hover:bg-cyan-600 border-cyan-600',      colorOff: 'bg-slate-700 border-slate-600 opacity-40' },
-  { buildingType: 'crypto', label: '⚡ Crypto',      colorOn: 'bg-purple-800 hover:bg-purple-600 border-purple-600',colorOff: 'bg-slate-700 border-slate-600 opacity-40' },
+  { buildingType: 'bond',   label: 'Gov. Bond',     activeStyle: { background: '#0f2d5c', border: '1px solid #1e4d8c', color: '#60a5fa' } },
+  { buildingType: 'stock',  label: 'Stock',         activeStyle: { background: '#0a2818', border: '1px solid #1a5c30', color: '#4ade80' } },
+  { buildingType: 'gold',   label: 'Gold',          activeStyle: { background: '#2a1a06', border: '1px solid #6b4a10', color: '#f0c040' } },
+  { buildingType: 'etf',    label: 'ETF / Index',   activeStyle: { background: '#061830', border: '1px solid #0c4060', color: '#06b6d4' } },
+  { buildingType: 'crypto', label: 'Crypto',        activeStyle: { background: '#1a0630', border: '1px solid #4a1060', color: '#a855f7' } },
 ]
 
 export default function ControlPanel({ balance, unlockedAssets, onBuy, onTriggerEvent }) {
   return (
-    <footer className="shrink-0 bg-slate-800 border-t border-slate-700 px-6 py-3">
-      <div className="flex items-center justify-between max-w-4xl mx-auto">
+    <footer className="shrink-0 flex items-center justify-between px-5 py-2.5"
+      style={{ background: '#0d1117', borderTop: '1px solid #1e2535' }}>
 
-        {/* Balance */}
-        <div className="text-sm min-w-[100px]">
-          <span className="text-slate-400 text-[10px] uppercase tracking-wider block">Balance</span>
-          <span className="font-bold text-white">CHF {balance.toLocaleString('de-CH')}</span>
+      {/* Balance */}
+      <div className="min-w-[110px]">
+        <div className="text-[9px] uppercase tracking-widest" style={{ color: '#374151' }}>Balance</div>
+        <div className="text-sm font-bold" style={{ color: '#e2c87a' }}>
+          CHF {balance.toLocaleString('de-CH')}
         </div>
-
-        {/* Buy buttons */}
-        <div className="flex gap-2">
-          {BUY_BUTTONS.map(({ buildingType, label, colorOn, colorOff }) => {
-            const assetKey = BUILDINGS[buildingType].assetKey
-            const isUnlocked = unlockedAssets.includes(assetKey)
-            const cost = BUILDINGS[buildingType].cost
-            const canAfford = balance >= cost
-
-            return (
-              <button
-                key={buildingType}
-                onClick={() => isUnlocked && canAfford && onBuy(buildingType)}
-                disabled={!isUnlocked || !canAfford}
-                className={`
-                  flex flex-col items-center px-4 py-1.5 rounded-lg border text-xs font-medium
-                  transition-colors min-w-[90px]
-                  ${isUnlocked && canAfford ? colorOn : colorOff}
-                  ${!isUnlocked || !canAfford ? 'cursor-not-allowed' : 'cursor-pointer'}
-                `}
-              >
-                <span>{isUnlocked ? label : `🔒 ${label.split(' ').slice(1).join(' ')}`}</span>
-                <span className="text-white/50 text-[10px] mt-0.5 font-normal">
-                  {isUnlocked ? `CHF ${cost}` : 'Study to unlock'}
-                </span>
-              </button>
-            )
-          })}
-        </div>
-
-        {/* Event trigger */}
-        <button
-          onClick={onTriggerEvent}
-          className="text-xs px-3 py-2 bg-red-900/60 hover:bg-red-700 border border-red-800 rounded-lg transition-colors"
-        >
-          🎲 Random Event
-        </button>
       </div>
+
+      {/* Buy buttons */}
+      <div className="flex items-center gap-2">
+        {BUY_BUTTONS.map(({ buildingType, label, activeStyle }) => {
+          const assetKey = BUILDINGS[buildingType].assetKey
+          const isUnlocked = unlockedAssets.includes(assetKey)
+          const cost = BUILDINGS[buildingType].cost
+          const canAfford = balance >= cost
+          const active = isUnlocked && canAfford
+
+          return (
+            <button
+              key={buildingType}
+              onClick={() => active && onBuy(buildingType)}
+              disabled={!active}
+              className="flex flex-col items-center px-4 py-1.5 rounded transition-all text-xs font-medium min-w-[90px]"
+              style={active ? activeStyle : {
+                background: '#0d1117',
+                border: '1px solid #1e2535',
+                color: '#2a3040',
+                cursor: isUnlocked ? 'not-allowed' : 'not-allowed',
+              }}
+            >
+              <span>{isUnlocked ? label : `\u{1F512} ${label}`}</span>
+              <span className="text-[10px] mt-0.5 font-normal" style={{ opacity: 0.6 }}>
+                {isUnlocked ? `CHF ${cost}` : 'Study to unlock'}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Random event */}
+      <button
+        onClick={onTriggerEvent}
+        className="text-xs px-3 py-2 rounded transition-colors"
+        style={{ background: '#1a0a0a', border: '1px solid #4a1010', color: '#f87171' }}
+      >
+        &#127922; Event
+      </button>
     </footer>
   )
 }

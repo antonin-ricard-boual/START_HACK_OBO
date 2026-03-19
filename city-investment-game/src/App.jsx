@@ -5,13 +5,14 @@ import ControlPanel from './components/ControlPanel'
 import Library from './components/Library'
 import EventBanner from './components/EventBanner'
 import AssetPicker from './components/AssetPicker'
-import { GRID_SIZE, DISTRICT_OF, BUILDINGS, EVENTS, computeMetrics } from './constants/game'
+import { GRID_COLS, GRID_ROWS, DISTRICT_OF, BUILDINGS, EVENTS, computeMetrics } from './constants/game'
 
-const RATHAUS_INDEX = 14  // row 2, col 2 — city district
-const LIBRARY_INDEX = 21  // row 3, col 3 — city district
+// City center rows 2-5, cols 3-8. Rathaus row 3 col 5, Library row 4 col 6.
+const RATHAUS_INDEX = 3 * GRID_COLS + 5   // 41
+const LIBRARY_INDEX = 4 * GRID_COLS + 6   // 54
 
 function createGrid() {
-  const grid = Array(GRID_SIZE * GRID_SIZE).fill(null)
+  const grid = Array(GRID_COLS * GRID_ROWS).fill(null)
   grid[RATHAUS_INDEX] = 'rathaus'
   grid[LIBRARY_INDEX] = 'library'
   return grid
@@ -27,24 +28,20 @@ export default function App() {
   const [badges, setBadges] = useState([])
   const [showLibrary, setShowLibrary] = useState(false)
   const [activeEvent, setActiveEvent] = useState(null)
-  // picker: { buildingType } | null
   const [picker, setPicker] = useState(null)
 
   const total = Object.values(portfolio).reduce((a, b) => a + b, 0)
   const metrics = computeMetrics(portfolio)
 
-  // Called by ControlPanel — open the picker instead of placing immediately
   function openPicker(buildingType) {
     const building = BUILDINGS[buildingType]
     if (balance < building.cost) return
     setPicker({ buildingType })
   }
 
-  // Called by AssetPicker when user selects a specific asset
   function confirmPurchase(buildingType, chosenAsset) {
     const building = BUILDINGS[buildingType]
     setPicker(null)
-
     setGrid(prev => {
       const i = prev.findIndex(
         (cell, idx) => cell === null && DISTRICT_OF[idx] === building.district
@@ -54,11 +51,8 @@ export default function App() {
       next[i] = buildingType
       return next
     })
-
     setBalance(b => b - building.cost)
-
     if (building.assetKey) {
-      // Use the real asset price as the portfolio value added
       setPortfolio(p => ({
         ...p,
         [building.assetKey]: p[building.assetKey] + (chosenAsset?.price ?? building.portfolioAdd),
@@ -85,7 +79,7 @@ export default function App() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-slate-900 text-white overflow-hidden">
+    <div className="flex flex-col h-screen overflow-hidden" style={{ background: '#0a0e1a' }}>
       <TopBar total={total} portfolio={portfolio} metrics={metrics} badges={badges} />
       {activeEvent && <EventBanner event={activeEvent} />}
       <CityGrid grid={grid} onLibraryClick={() => setShowLibrary(true)} />

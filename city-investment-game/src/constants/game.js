@@ -1,23 +1,22 @@
-export const GRID_SIZE = 6
+export const GRID_COLS = 12
+export const GRID_ROWS = 8
 
 /*
-  Grid layout (6×6):
-  ┌─────────────────────┐
-  │  GOLD   GOLD   GOLD │  row 0
-  │  GOLD   GOLD   GOLD │  row 1
-  │ BOND│BOND│CITY│CITY│STCK│STCK │  row 2
-  │ BOND│BOND│CITY│CITY│STCK│STCK │  row 3
-  │  CRYPTO  CRYPTO  CRYPTO│  row 4
-  │  CRYPTO  CRYPTO  CRYPTO│  row 5
-  └─────────────────────┘
+  Grid layout (12×8):
+  ┌──────────────────────────────────────────────────┐
+  │  GOLD  GOLD  GOLD  GOLD  GOLD  GOLD  ... (row 0) │
+  │  GOLD  GOLD  GOLD  GOLD  GOLD  GOLD  ... (row 1) │
+  │ BOND│BOND│BOND│ CITY  CITY  CITY  CITY│STCK│STCK│STCK │ (rows 2-5)
+  │  CRYPTO  CRYPTO  CRYPTO  CRYPTO  ...  (rows 6-7) │
+  └──────────────────────────────────────────────────┘
 */
-export const DISTRICT_OF = Array.from({ length: GRID_SIZE * GRID_SIZE }, (_, i) => {
-  const row = Math.floor(i / GRID_SIZE)
-  const col = i % GRID_SIZE
+export const DISTRICT_OF = Array.from({ length: GRID_COLS * GRID_ROWS }, (_, i) => {
+  const row = Math.floor(i / GRID_COLS)
+  const col = i % GRID_COLS
   if (row <= 1) return 'gold'
-  if (row >= 4) return 'crypto'
-  if (col <= 1) return 'bonds'
-  if (col >= 4) return 'stocks'
+  if (row >= 6) return 'crypto'
+  if (col <= 2) return 'bonds'
+  if (col >= 9) return 'stocks'
   return 'city'
 })
 
